@@ -9,6 +9,9 @@ on:
       folder_name:
         description: 'Name of the folder in S3'
         required: true
+      source_dir:
+        description: 'Source directory containing files to upload'
+        required: true
 
 jobs:
   upload:
@@ -21,8 +24,7 @@ jobs:
         uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
           source_dir: ${{ github.event.inputs.source_dir }}
           destination_dir: ${{ github.event.inputs.folder_name }}
-
