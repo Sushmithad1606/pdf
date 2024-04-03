@@ -10,8 +10,11 @@ on:
         description: 'Name of the folder in S3'
         required: true
       source_dir:
-        description: 'Source directory containing files to upload'
+        description: 'Path to the directory containing files to upload'
         required: true
+      file_name:
+        description: 'Name of the file to be included (optional)'
+        required: false
 
 jobs:
   upload:
