@@ -6,10 +6,7 @@ on:
       bucket_name:
         description: 'S3 bucket name'
         required: true
-        default: 'default-bucket'
-      folder_name:
-        description: 'Name of the folder in S3'
-        required: true
+        default: 'default-bucket'  
 
 jobs:
   upload:
