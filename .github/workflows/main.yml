@@ -1,16 +1,22 @@
 name: Upload to S3
 
 on:
-  push:
-    branches:
-      - main  # Adjust this according to your branch name
+  workflow_dispatch:
+    inputs:
+      bucket_name:
+        description: 'S3 bucket name'
+        required: true
+        default: 'default-bucket'  
 
 jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: shallwefootball/s3-upload-action@master
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Upload to S3
+        uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
