@@ -6,7 +6,9 @@ on:
       bucket_name:
         description: 'S3 bucket name'
         required: true
-       
+      folder_name:
+        description: 'Name of the folder in S3'
+        required: true
 
 jobs:
   upload:
@@ -22,3 +24,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
           source_dir: 'assets'
+          destination_dir: ${{ github.event.inputs.folder_name }}
+
