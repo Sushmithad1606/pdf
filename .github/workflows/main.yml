@@ -6,7 +6,7 @@ on:
       bucket_name:
         description: 'S3 bucket name'
         required: true
-        default: 'default-bucket'  
+       
 
 jobs:
   upload:
