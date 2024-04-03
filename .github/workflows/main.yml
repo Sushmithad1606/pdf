@@ -1,4 +1,4 @@
-name: Upload to S3
+name: Upload PDF to S3
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         required: true
         default: 'default-bucket'
       folder_name:
-        description: 'Name of the folder in S3'
+        description: 'Name of the folder in S3 where the PDF should be uploaded'
         required: true
 
 jobs:
@@ -18,10 +18,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@master
+      - name: Upload PDF to S3
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: ${{ github.event.inputs.bucket_name }}
-          source_dir: ${{ github.event.inputs.folder_name }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+
+      - name: Determine S3 Folder
+        id: determine_folder
+        run: |
+          folder_name="${{ github.event.inputs.folder_name }}"
+          if [ "$folder_name" = "folder1" ]; then
+            echo "Folder 1 is selected"
+            echo "::set-output name=folder_path::folder1/"
+          elif [ "$folder_name" = "folder2" ]; then
+            echo "Folder 2 is selected"
+            echo "::set-output name=folder_path::folder2/"
+          else
+            echo "Invalid folder name provided"
+            exit 1
+          fi
+
+      - name: Upload PDF to S3
+        run: aws s3 cp file.pdf s3://${{ github.event.inputs.bucket_name }}/${{ steps.determine_folder.outputs.folder_path }}
