@@ -23,12 +23,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@master
+      - name: Copy file from S3
+        uses: prewk/s3-cp-action@v2
         with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: ${{ github.event.inputs.bucket_name }}
-          source_dir: '${{ github.event.inputs.directory_name }}' 
-          file_name: ${{ github.event.inputs.file_name }}
-          destination_dir: '${{ github.event.inputs.folder_name }}/'
+          source: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.directory_name }}/${{ github.event.inputs.file_name }}'
+          dest: '${{ github.event.inputs.folder_name }}'
