@@ -40,4 +40,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
           source: ${{ steps.filter_files.outputs.file_path }}
-          destination: '${{ github.event.inputs.folder_name }}/${{ github.event.inputs.file_name }}'
+          destination_dir: '${{ github.event.inputs.folder_name }}/'
