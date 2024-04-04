@@ -1,10 +1,10 @@
-name: Upload a folder to S3
+name: Upload a file to S3
 
 on:
   workflow_dispatch:
     inputs:
-      source_directory:
-        description: 'Path to the local directory to upload'
+      source_file:
+        description: 'Name of the file to upload'
         required: true
       bucket_name:
         description: 'Name of the S3 bucket'
@@ -19,11 +19,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Copy a folder to S3
+    - name: Copy a file to S3
       uses: prewk/s3-cp-action@v2
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: ${{ github.event.inputs.source_directory }}
-        dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}'
-        
+        source: '${{ github.workspace }}/${{ github.event.inputs.source_file }}'
+        dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.source_file }}'
