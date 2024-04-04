@@ -9,8 +9,11 @@ on:
       folder_name:
         description: 'Name of the folder in S3'
         required: true
-      file_path_in_directory:
-        description: 'Path to the file inside the directory to upload'
+      directory_name:
+        description: 'Name of the directory containing the file to upload'
+        required: true
+      file_name:
+        description: 'Name of the file to be uploaded'
         required: true
 
 jobs:
@@ -26,5 +29,5 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
-          source_dir: ${{ github.workspace }}/${{ github.event.inputs.file_path_in_directory }}
+          source_dir: '${{ github.event.inputs.directory_name }}/${{ github.event.inputs.file_name }}'
           destination_dir: '${{ github.event.inputs.folder_name }}/'
