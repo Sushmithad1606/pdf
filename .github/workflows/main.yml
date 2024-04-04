@@ -1,4 +1,3 @@
-
 name: Upload to S3
 
 on:
@@ -10,11 +9,8 @@ on:
       folder_name:
         description: 'Name of the folder in S3'
         required: true
-      source_dir:
-        description: 'Path to the directory containing files to upload'
-        required: true
-      file_name:
-        description: 'Name of the file to be included'
+      source_file_path:
+        description: 'Full path to the file to upload'
         required: true
 
 jobs:
@@ -23,12 +19,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
-          source_dir: ${{ github.workspace }}/${{ github.event.inputs.source_file_path }}
+          source_dir: ${{ github.event.inputs.source_file_path }}
           destination_dir: '${{ github.event.inputs.folder_name }}/'
