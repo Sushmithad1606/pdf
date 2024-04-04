@@ -24,11 +24,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@master
-        with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: ${{ github.event.inputs.bucket_name }}
-          source_dir: '${{ github.event.inputs.directory_name }}'  # Remove the file_name part
-          file_name: ${{ github.event.inputs.file_name }}
-          destination_dir: '${{ github.event.inputs.folder_name }}/'
+        run: aws s3 cp ${{ github.event.inputs.directory_name }}/${{ github.event.inputs.file_name }} s3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.folder_name }}/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
