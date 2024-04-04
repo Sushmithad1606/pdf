@@ -1,32 +1,29 @@
-name: Upload to S3
+name: Upload a folder to S3
 
 on:
   workflow_dispatch:
     inputs:
+      source_directory:
+        description: 'Path to the local directory to upload'
+        required: true
       bucket_name:
-        description: 'S3 bucket name'
+        description: 'Name of the S3 bucket'
         required: true
-      folder_name:
-        description: 'Name of the folder in S3'
-        required: true
-      directory_name:
-        description: 'Name of the directory containing the file to upload'
-        required: true
-      file_name:
-        description: 'Name of the file to be uploaded'
+      destination_path:
+        description: 'Destination path in the S3 bucket'
         required: true
 
 jobs:
-  upload:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Copy file from S3
-        uses: prewk/s3-cp-action@v2
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          source: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.directory_name }}/${{ github.event.inputs.file_name }}'
-          dest: '${{ github.event.inputs.folder_name }}'
+    - uses: actions/checkout@v2
+    
+    - name: Copy a folder to S3
+      uses: prewk/s3-cp-action@v2
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        source: ${{ github.event.inputs.source_directory }}
+        dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}'
+        
