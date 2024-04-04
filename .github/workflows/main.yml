@@ -30,4 +30,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ github.event.inputs.bucket_name }}
           source_dir: ${{ github.event.inputs.source_dir }}
-          destination_dir: ${{ github.event.inputs.folder_name }}
+          destination_dir: '${{ github.event.inputs.folder_name }}/'
