@@ -14,7 +14,7 @@ on:
         required: true
       file_name:
         description: 'Name of the file to be included'
-        required: false
+        required: true
 
 jobs:
   upload:
