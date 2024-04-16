@@ -11,6 +11,7 @@ on:
          - konvokubeace1
          - konvokubeace2
          - konvokubeace3
+
       destination_path:
         description: 'Destination path in the S3 bucket'
         required: true
@@ -22,22 +23,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-      - name: Normalize destination path
-        id: normalize
-        run: echo "::set-output name=normalized_destination_path::${{ inputs.destination_path }}" | sed 's:/*$::'
-      
-      - name: Copy a file to S3
-        uses: prewk/s3-cp-action@v2
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${
-            { 
-              { github.event.inputs.bucket_selection } 
-            } 
-          }/${{ steps.normalize.outputs.normalized_destination_path }}/${{ github.event.inputs.file_name }}'
-        env:
-          flags: '--acl public-read --metadata=Cache-Control=86400'
+    - name: Normalize destination path
+      run: echo "normalized_destination_path=${{ github.event.inputs.destination_path%/ }}" >> $GITHUB_ENV
+
+    - name: Copy a file to S3
+      uses: prewk/s3-cp-action@v2
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
+        dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.normalized_destination_path }}/${{ github.event.inputs.file_name }}'
+      env:
+        flags: '--acl public-read --metadata=Cache-Control=86400'
