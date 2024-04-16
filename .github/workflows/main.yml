@@ -3,15 +3,10 @@ name: Upload a file from Assets to S3
 on:
   workflow_dispatch:
     inputs:
-      bucket_name:
-        description: 'Name of the S3 bucket'
+      bucket_selection:
+        description: 'Select the S3 bucket'
         required: true
-      destination_path:
-        description: 'Destination path in the S3 bucket'
-        required: true
-      file_name:
-        description: 'Name of the file to upload from the "assets" directory'
-        required: true
+        options: [bucket1, bucket2, bucket3] # Add your bucket names here
 
 jobs:
   deploy:
@@ -25,7 +20,12 @@ jobs:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-        dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
-    
-    - name: Set ACL to public-read
-      run: aws s3api put-object-acl --bucket ${{ github.event.inputs.bucket_name }} --key ${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }} --acl public-read
+        dest: 's3://${
+          { 
+            { 
+              github.event.inputs.bucket_selection 
+            } 
+          }
+        }/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
+      env:
+        flags: '--acl public-read --metadata=Cache-Control=86400'
