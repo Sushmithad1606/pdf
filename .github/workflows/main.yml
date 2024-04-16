@@ -1,27 +1,37 @@
-name: Normalize destination path
+
+name: Upload a file from Assets to S3
 
 on:
   workflow_dispatch:
     inputs:
+      bucket_selection:
+        description: 'Select the S3 bucket'
+        required: true
+        type: choice
+        options:
+          - konvokubeace1
+          - konvokubeace2
+          - konvokubeace3
       destination_path:
         description: 'Destination path in the S3 bucket'
         required: true
+      file_name:
+        description: 'Name of the file to upload from the "assets" directory'
+        required: true
 
 jobs:
-  normalize_path:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Remove trailing backslashes
-        run: |
-          normalized_path=$(echo "${{ github.event.inputs.destination_path }}" | sed 's/\\$//')
-          echo "::set-output name=normalized_destination_path::$normalized_path"
-
-      - name: Upload a file from Assets to S3
+      - name: Checkout repository
+        uses: actions/checkout@v2
+    
+      - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_name }}/${{ steps.normalize_path.outputs.normalized_destination_path }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
