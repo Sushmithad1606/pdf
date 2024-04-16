@@ -26,5 +26,6 @@ jobs:
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
         dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
-      env:
-        flags: '--acl public-read --metadata=Cache-Control=86400'
+    
+    - name: Set ACL to public-read
+      run: aws s3api put-object-acl --bucket ${{ github.event.inputs.bucket_name }} --key ${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }} --acl public-read
