@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
-         - b1
-         - b2
-         - b3
+         - konvokubeace1
+         - konvokubeace2
+         - konvokubeace3
 
       destination_path:
         description: 'Destination path in the S3 bucket'
