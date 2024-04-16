@@ -6,7 +6,11 @@ on:
       bucket_selection:
         description: 'Select the S3 bucket'
         required: true
-        options: [bucket1, bucket2, bucket3] # Add your bucket names here
+        type: choice
+        options:
+         - b1
+         - b2
+         -b3
 
 jobs:
   deploy:
