@@ -25,12 +25,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
     
+      - name: Normalize destination path
+        run: echo "::set-output name=normalized_destination_path::${{ github.event.inputs.destination_path%/ }}"
+
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ steps.normalize_destination_path.outputs.normalized_destination_path }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
