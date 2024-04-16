@@ -26,7 +26,7 @@ jobs:
     
       - name: Normalize destination path
         id: normalize
-        run: echo "::set-output name=normalized_destination_path::${{ inputs.destination_path%/ }}"
+        run: echo "::set-output name=normalized_destination_path::${{ inputs.destination_path }}" | sed 's:/*$::'
       
       - name: Copy a file to S3
         uses: prewk/s3-cp-action@v2
