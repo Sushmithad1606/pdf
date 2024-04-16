@@ -17,14 +17,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
     
-    - name: Copy a file to S3
-      uses: prewk/s3-cp-action@v2
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-        dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
-      env:
-        flags: '--acl public-read --metadata=Cache-Control=86400'
+      - name: Copy a file to S3
+        uses: prewk/s3-cp-action@v2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
+        env:
+          flags: '--acl public-read --metadata=Cache-Control=86400'
+
+      - name: Upload file to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: '--acl public-read --follow-symlinks --delete'
