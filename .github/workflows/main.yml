@@ -12,6 +12,14 @@ on:
          - b2
          - b3
 
+      destination_path:
+        description: 'Destination path in the S3 bucket'
+        required: true
+      file_name:
+        description: 'Name of the file to upload from the "assets" directory'
+        required: true
+
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
