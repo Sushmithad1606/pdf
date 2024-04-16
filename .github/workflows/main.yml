@@ -26,4 +26,19 @@ jobs:
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
         dest: 's3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
-        args: '--acl public-read'
+
+    - name: Set S3 Bucket Policy
+      run: |
+        aws s3api put-bucket-policy --bucket ${{ github.event.inputs.bucket_name }} --policy '{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "PublicReadGetObject",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "arn:aws:s3:::${{ github.event.inputs.bucket_name }}/*"
+                }
+            ]
+        }'
+     
