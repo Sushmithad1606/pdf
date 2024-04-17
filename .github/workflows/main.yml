@@ -1,3 +1,5 @@
+
+
 name: Upload a file from Assets to S3
 
 on:
@@ -17,7 +19,6 @@ on:
       file_name:
         description: 'Name of the file to upload from the "assets" directory'
         required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,20 +26,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-         
-
       - name: Process destination path
         id: path
         run: |
           destination_path="${{ github.event.inputs.destination_path }}"
           destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
-          echo "DEST_PATH=$destination_path_trimmed" >> $GITHUB_ENV
-
-      - name: Upload file to S3 with public-read acl
-        run: |
-          aws s3api put-object --bucket ${{ github.event.inputs.bucket_selection }} --key ${{ env.DEST_PATH }}/${{ github.event.inputs.file_name }} --body ./assets/${{ github.event.inputs.file_name }} --acl public-read
+          echo "destination_path_trimmed=$destination_path_trimmed" >> $GITHUB_ENV
+      - name: Copy file to S3
+        uses: prewk/s3-cp-action@v2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}'
+        env:
+          flags: '--acl public-read --metadata=Cache-Control=86400'
