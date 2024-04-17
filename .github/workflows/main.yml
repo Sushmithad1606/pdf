@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-          - static.tal.com
-          - assets.tal.com
+          - static.talview.com
+          - assets.talview.com
       destination_path:
         description: 'Destination path in the S3 bucket'
         required: true
@@ -26,10 +26,10 @@ jobs:
 
       - name: Setup bucket based on endpoint selection
         run: |
-          if [ "${{ github.event.inputs.endpoint_selection }}" == "static.tal.com" ]; then
-            echo "BUCKET_NAME=s3proxy.tal.com" >> $GITHUB_ENV
+          if [ "${{ github.event.inputs.endpoint_selection }}" == "static.talview.com" ]; then
+            echo "BUCKET_NAME=s3proxy.talview.com" >> $GITHUB_ENV
           else
-            echo "BUCKET_NAME=talassetss" >> $GITHUB_ENV
+            echo "BUCKET_NAME=talviewassets" >> $GITHUB_ENV
           fi
 
       - name: Process destination path
