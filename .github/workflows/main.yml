@@ -30,21 +30,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set public-read ACL on S3 bucket
-        run: aws s3api put-bucket-acl --bucket ${{ github.event.inputs.bucket_selection }} --acl public-read
-
-      - name: Update bucket policy to allow public read access
-        run: aws s3api put-bucket-policy --bucket ${{ github.event.inputs.bucket_selection }} --policy file://s3-bucket-policy.json
-
       - name: Process destination path
         run: |
           destination_path="${{ github.event.inputs.destination_path }}"
           destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
           echo "DESTINATION_PATH_TRIMMED=${destination_path_trimmed}" >> $GITHUB_ENV
 
-      - name: Upload file to S3
-        uses: prewk/s3-cp-action@v2
-        with:
-          source: './assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.DESTINATION_PATH_TRIMMED }}/${{ github.event.inputs.file_name }}'
-          flags: '--acl public-read --metadata Cache-Control=max-age=86400'
+      - name: Upload file to S3 and set public-read ACL
+        run: aws s3 cp ./assets/${{ github.event.inputs.file_name }} s3://${{ github.event.inputs.bucket_selection }}/${{ env.DESTINATION_PATH_TRIMMED }}/${{ github.event.inputs.file_name }} --acl public-read
