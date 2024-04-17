@@ -3,20 +3,20 @@ name: Upload a file from Assets to S3
 on:
   workflow_dispatch:
     inputs:
-      endpoint_selection:
-        description: 'Select the endpoint'
+      bucket_selection:
+        description: 'Select the S3 bucket'
         required: true
         type: choice
         options:
-          - static.tal.com
-          - assets.tal.com
+          - konvokubeace1
+          - konvokubeace2
+          - konvokubeace3
       destination_path:
         description: 'Destination path in the S3 bucket'
         required: true
       file_name:
         description: 'Name of the file to upload from the "assets" directory'
         required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,24 +24,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup bucket based on endpoint selection
-        id: set-bucket
-        run: |
-          if [ "${{ github.event.inputs.endpoint_selection }}" == "static.tal.com" ]; then
-            echo "BUCKET_NAME=s3proxy.tal.com" >> $GITHUB_ENV
-          else
-            echo "BUCKET_NAME=talassetss" >> $GITHUB_ENV
-          fi
-
       - name: Process destination path
+        id: path
         run: |
           destination_path="${{ github.event.inputs.destination_path }}"
           destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
           echo "destination_path_trimmed=$destination_path_trimmed" >> $GITHUB_ENV
-
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          source: './assets/${{ github.event.inputs.file_name }} 
+          source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}' 
+          flags: '--acl public-read-write'
