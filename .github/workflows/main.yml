@@ -24,15 +24,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-    
-      - name: Make script executable
-        run: |
-          chmod +x remove_trailing_slash.sh
-        working-directory: shelllscript.sh
 
-      - name: Run shell script
+      - name: Remove trailing slash from destination path
         run: |
-          ./remove_trailing_slash.sh "${{ github.event.inputs.destination_path }}"
+          normalized_path=$(echo "${{ github.event.inputs.destination_path }}" | sed 's/\/$//')
+          echo "::set-output name=normalized_destination_path::$normalized_path"
 
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
@@ -40,6 +36,6 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ github.event.inputs.destination_path }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ steps.remove_trailing_slash.outputs.normalized_destination_path }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
