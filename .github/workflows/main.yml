@@ -1,4 +1,4 @@
-name: Upload a file from Assets to S3
+name: Upload a file from Assets to S3 and set public-read ACL
 
 on:
   workflow_dispatch:
@@ -30,6 +30,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Disable block public access settings on S3 bucket (Be cautious!)
+        run: |
+          aws s3api put-public-access-block \
+            --bucket ${{ github.event.inputs.bucket_selection }} \
+            --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+        continue-on-error: true # Continue if the bucket already has these settings
+
       - name: Process destination path
         run: |
           destination_path="${{ github.event.inputs.destination_path }}"
@@ -37,4 +44,5 @@ jobs:
           echo "DESTINATION_PATH_TRIMMED=${destination_path_trimmed}" >> $GITHUB_ENV
 
       - name: Upload file to S3 and set public-read ACL
-        run: aws s3 cp ./assets/${{ github.event.inputs.file_name }} s3://${{ github.event.inputs.bucket_selection }}/${{ env.DESTINATION_PATH_TRIMMED }}/${{ github.event.inputs.file_name }} --acl public-read
+        run: |
+          aws s3 cp ./assets/${{ github.event.inputs.file_name }} s3://${{ github.event.inputs.bucket_selection }}/${{ env.DESTINATION_PATH_TRIMMED }}/${{ github.event.inputs.file_name }} --acl public-read
