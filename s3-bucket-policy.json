@@ -1,1 +1,16 @@
-
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadForObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::konvokubeace1/*",
+        "arn:aws:s3:::konvokubeace2/*",
+        "arn:aws:s3:::konvokubeace3/*"
+      ]
+    }
+  ]
+}
