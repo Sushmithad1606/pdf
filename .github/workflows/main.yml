@@ -26,6 +26,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Unblock public access and upload bucket policy
+        run: |
+          aws s3api put-bucket-acl --bucket ${{ github.event.inputs.bucket_selection }} --acl public-read
+          aws s3api put-bucket-policy --bucket ${{ github.event.inputs.bucket_selection }} --policy file://s3-bucket-policy.json
+
       - name: Process destination path
         id: path
         run: |
@@ -39,5 +44,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
           dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}'
-        env:
-          flags: '--acl public-read --metadata=Cache-Control=86400'
+       
