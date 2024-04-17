@@ -1,3 +1,4 @@
+
 name: Upload a file from Assets to S3
 
 on:
@@ -25,12 +26,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Remove slash from destination path
+        run: |
+          modified_path=$(echo "${{ github.event.inputs.destination_path }}" | sed 's:/$::')
+          echo $modified_path
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ echo "${{ github.event.inputs.destination_path }}" | sed 's:/$::' }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ steps.remove_slash.outputs.modified_path }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
