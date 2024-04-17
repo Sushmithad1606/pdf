@@ -39,6 +39,6 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}'
-        env:
-          flags: '--acl public-read --metadata=Cache-Control=86400'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}' 
+          flags: '--acl public-read-write'
+       
