@@ -1,37 +1,42 @@
-name: Upload and set public access to a file in S3
+
+name: Upload a file from Assets to S3
 
 on:
   workflow_dispatch:
     inputs:
-      bucket_name:
-        description: 'S3 Bucket name'
+      bucket_selection:
+        description: 'Select the S3 bucket'
         required: true
-      file_path:
-        description: 'Local file path to be uploaded'
+        type: choice
+        options:
+          - konvokubeace1
+          - konvokubeace2
+          - konvokubeace3
+      destination_path:
+        description: 'Destination path in the S3 bucket'
         required: true
-      s3_key:
-        description: 'S3 Object key including file name'
+      file_name:
+        description: 'Name of the file to upload from the "assets" directory'
         required: true
-
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: 'us-east-1' 
-
 jobs:
-  upload_to_s3:
+  deploy:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Disable block public access settings on S3 bucket (Be cautious!)
+      - name: Process destination path
+        id: path
         run: |
-          aws s3api put-public-access-block \
-            --bucket ${{ github.event.inputs.bucket_name }} \
-            --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
-        continue-on-error: true # Continue if the bucket already has these settings
-
-      - name: Upload file to S3 and set public-read ACL
-        run: aws s3 cp ${{ github.event.inputs.file_path }} s3://${{ github.event.inputs.bucket_name }}/${{ github.event.inputs.s3_key }} --acl public-read
+          destination_path="${{ github.event.inputs.destination_path }}"
+          destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
+          echo "destination_path_trimmed=$destination_path_trimmed" >> $GITHUB_ENV
+      - name: Copy file to S3
+        uses: prewk/s3-cp-action@v2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}'
+        env:
+          flags: '--acl public-read --metadata=Cache-Control=86400'
