@@ -25,6 +25,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set public access block configuration on the S3 bucket
+        run: |
+          aws s3api put-public-access-block \
+            --bucket cc-internal-data \
+            --us-east-1 \
+            --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
       - name: Process destination path
         id: path
         run: |
