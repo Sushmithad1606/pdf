@@ -28,7 +28,7 @@ jobs:
       - name: Make script executable
         run: |
           chmod +x remove_trailing_slash.sh
-        working-directory: pdf/shelllscript.sh
+        working-directory: shelllscript.sh
 
       - name: Run shell script
         run: |
