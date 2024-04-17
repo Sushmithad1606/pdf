@@ -28,7 +28,7 @@ jobs:
       - name: Remove slash from destination path
         run: |
           modified_path=$(echo "${{ github.event.inputs.destination_path }}" | sed 's:/$::')
-          echo "::set-output name=modified_destination_path::$modified_path"
+          echo $modified_path
 
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
@@ -36,6 +36,6 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ steps.remove_trailing_slash.outputs.modified_destination_path }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ steps.remove_slash.outputs.modified_path }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
