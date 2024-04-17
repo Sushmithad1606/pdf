@@ -18,7 +18,6 @@ on:
       file_name:
         description: 'Name of the file to upload from the "assets" directory'
         required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,16 +25,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Remove slash from destination path
+      - name: Process destination path
+        id: path
         run: |
-          modified_path=$(echo "${{ github.event.inputs.destination_path }}" | sed 's:/$::')
-          echo $modified_path
+          destination_path="${{ github.event.inputs.destination_path }}"
+          destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
+          echo "destination_path_trimmed=$destination_path_trimmed" >> $GITHUB_ENV
+
       - name: Copy file to S3
         uses: prewk/s3-cp-action@v2
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           source: '${{ github.workspace }}/assets/${{ github.event.inputs.file_name }}'
-          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ github.event.inputs.modified_path }}/${{ github.event.inputs.file_name }}'
+          dest: 's3://${{ github.event.inputs.bucket_selection }}/${{ env.destination_path_trimmed }}/${{ github.event.inputs.file_name }}'
         env:
           flags: '--acl public-read --metadata=Cache-Control=86400'
