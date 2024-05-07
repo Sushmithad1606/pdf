@@ -29,7 +29,7 @@ jobs:
           if [ "${{ github.event.inputs.endpoint_selection }}" == "static.ta.com" ]; then
             echo "BUCKET_NAME=s3proxy.ta.com" >> $GITHUB_ENV
           else
-            echo "BUCKET_NAME=talassets" >> $GITHUB_ENV
+            echo "BUCKET_NAME=talassetss" >> $GITHUB_ENV
           fi
 
       - name: Process destination path
