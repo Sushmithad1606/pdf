@@ -35,7 +35,7 @@ jobs:
       - name: Process destination path
         run: |
           destination_path="${{ github.event.inputs.destination_path }}"
-          destination_path_trimmed=$(echo "$destination_path" | sed 's:/*$::') # Removes trailing slashes
+          destination_path_trimmed=$(echo "$destination_path" | sed 's:^/*::' | sed 's:/*$::') # Removes leading and trailing slashes
           echo "destination_path_trimmed=$destination_path_trimmed" >> $GITHUB_ENV
 
       - name: Copy file to S3
