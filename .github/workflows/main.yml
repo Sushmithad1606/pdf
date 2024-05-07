@@ -27,7 +27,7 @@ jobs:
       - name: Setup bucket based on endpoint selection
         run: |
           if [ "${{ github.event.inputs.endpoint_selection }}" == "static.ta.com" ]; then
-            echo "BUCKET_NAME=s3proxy.tal.com" >> $GITHUB_ENV
+            echo "BUCKET_NAME=s3proxy.ta.com" >> $GITHUB_ENV
           else
             echo "BUCKET_NAME=talassets" >> $GITHUB_ENV
           fi
